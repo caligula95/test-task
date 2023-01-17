@@ -1,0 +1,46 @@
+Parameters:
+  Prefix:
+    Type: String
+    Default: testapp
+Resources:
+  RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      EndpointConfiguration:
+        Types:
+          - EDGE
+      Name: !Ref Prefix
+
+  Deployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn:
+      - Method
+    Properties:
+      RestApiId: !Ref RestApi
+
+  Resource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt RestApi.RootResourceId
+      PathPart: !Sub "${Prefix}-resource"
+      RestApiId: !Ref RestApi
+
+  Stage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId: !Ref Deployment
+      RestApiId: !Ref RestApi
+      StageName: !Sub "${Prefix}-stage"
+
+  Method:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        ConnectionType: INTERNET
+        IntegrationHttpMethod: GET
+        Type: HTTP_PROXY
+        Uri: "http://fargatealb-234174894.eu-central-1.elb.amazonaws.com"
+      ResourceId: !Ref Resource
+      RestApiId: !Ref RestApi

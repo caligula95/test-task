@@ -1,0 +1,90 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "https://ntklmq8v18.execute-api.eu-central-1.amazonaws.com",
+      "description": "Generated server url"
+    }
+  ],
+  "paths": {
+    "/repositories": {
+      "get": {
+        "tags": [
+            "repository-controller"
+        ],
+        "operationId": "getRepositories",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Accept",
+            "in": "header",
+            "schema": {
+              "type": "string",
+              "enum": [
+                  "application/json"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Repository"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Branch": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "lastCommitSha": {
+            "type": "string"
+          }
+        }
+      },
+      "Repository": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "ownerLogin": {
+            "type": "string"
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Branch"
+            }
+          }
+        }
+      }
+    }
+  }
+}

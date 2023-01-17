@@ -1,0 +1,101 @@
+Resources:
+  TestTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      RequiresCompatibilities:
+        - "FARGATE"
+      ExecutionRoleArn: "arn:aws:iam::428002261199:role/ecsTaskExecutionRole"
+      Cpu: 256
+      Memory: 512
+      NetworkMode: "awsvpc"
+      ContainerDefinitions:
+        - Name: "test-app"
+          Image: "428002261199.dkr.ecr.eu-central-1.amazonaws.com/test-app:latest"
+          MemoryReservation: 256
+          Memory: 512
+          PortMappings:
+            - ContainerPort: 8080
+              Protocol: tcp
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: TestFargateCluster
+  FargateAlb:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: FargateAlb
+      Subnets:
+        - subnet-0795bdadae3a665d9
+        - subnet-0101a545fd94dd440
+        - subnet-013811d8c85044269
+      Type: application
+      SecurityGroups:
+        - !GetAtt FargateAlbSG.GroupId
+  TestFargateTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: TestFargateTargetGroup
+      VpcId: vpc-0595e65193a76ae4c
+      Protocol: HTTP
+      Port: 8080
+      HealthCheckPath: /actuator/
+      TargetType: ip
+  Listener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      DefaultActions:
+        - TargetGroupArn: !Ref TestFargateTargetGroup
+          Type: forward
+      LoadBalancerArn: !Ref FargateAlb
+      Port: 80
+      Protocol: HTTP
+  FargateAlbSG:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: SG for the Fargate ALB
+      GroupName: FargateAlbSG
+      SecurityGroupIngress:
+        - CidrIpv6: ::/0
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: TCP
+          Description: 'Inbound rule for IPv6 traffic'
+        - CidrIp: 0.0.0.0/0
+          FromPort: 80
+          ToPort: 80
+          IpProtocol: TCP
+          Description: 'Inbound rule for IPv4 traffic'
+  Alb2FargateContainers:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: SG for traffic between ALB and containers
+      GroupName: Alb2FargateContainers
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          SourceSecurityGroupId: !GetAtt FargateAlbSG.GroupId
+          Description: 'Inbound rule for all traffic'
+  TestECSService:
+    Type: AWS::ECS::Service
+    DependsOn:
+      - Listener
+    Properties:
+      LaunchType: FARGATE
+      Cluster:
+        Ref: "ECSCluster"
+      DesiredCount: 2
+      TaskDefinition:
+        Ref: "TestTaskDefinition"
+      DeploymentConfiguration:
+        MaximumPercent: 100
+        MinimumHealthyPercent: 0
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !GetAtt Alb2FargateContainers.GroupId
+          Subnets: ['subnet-0795bdadae3a665d9','subnet-0101a545fd94dd440', 'subnet-013811d8c85044269']
+      LoadBalancers:
+        - TargetGroupArn:
+            Ref: TestFargateTargetGroup
+          ContainerPort: 8080
+          ContainerName: test-app
