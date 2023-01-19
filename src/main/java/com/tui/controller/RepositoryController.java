@@ -4,15 +4,15 @@ import com.tui.model.Repository;
 import com.tui.service.RepositoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import static org.springframework.http.HttpHeaders.ACCEPT;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 /**
  * REST controller responsible for repositories requests
@@ -21,15 +21,14 @@ import java.util.List;
  */
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/repositories")
 @Slf4j
 public class RepositoryController {
 
     private final RepositoryService repositoryService;
 
-    @GetMapping(headers = HttpHeaders.ACCEPT + "=" + MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Repository>> getRepositories(@RequestParam String username) {
+    @GetMapping(value = "/users/{username}/repositories", headers = ACCEPT + "=" + APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Repository>> getRepositories(@PathVariable String username) {
         log.info("Handling get user repositories request with username: {}", username);
-        return ResponseEntity.ok(repositoryService.getRepositoriesByUsername(username));
+        return ResponseEntity.ok(repositoryService.getNonForkRepositoriesByUsername(username));
     }
 }

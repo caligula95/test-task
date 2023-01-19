@@ -12,10 +12,10 @@ import java.util.List;
 public interface RepositoryService {
 
     /**
-     * Method responsible for getting owner repos along with branches
+     * Method responsible for getting owner non forked repos along with branches
      *
      * @param username repositories owner
-     * @return list of com.tui.model.Repository
+     * @return {@link Repository}
      */
-    List<Repository> getRepositoriesByUsername(String username);
+    List<Repository> getNonForkRepositoriesByUsername(String username);
 }

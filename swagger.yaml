@@ -6,12 +6,12 @@
   },
   "servers": [
     {
-      "url": "https://ntklmq8v18.execute-api.eu-central-1.amazonaws.com",
+      "url": "https://ifsa2wc7ca.execute-api.eu-central-1.amazonaws.com",
       "description": "Generated server url"
     }
   ],
   "paths": {
-    "/repositories": {
+    "/users/{username}/repositories": {
       "get": {
         "tags": [
             "repository-controller"
@@ -20,7 +20,7 @@
         "parameters": [
           {
             "name": "username",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string"

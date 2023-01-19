@@ -71,7 +71,7 @@ public class RepositoryControllerIntegrationTest {
                 .thenReturn(ResponseEntity.ok(List.of()));
 
         mockMvc.perform(
-                        get("/repositories?username=testUser")
+                        get("/users/testUser/repositories")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -94,7 +94,7 @@ public class RepositoryControllerIntegrationTest {
                 .thenReturn(ResponseEntity.ok(List.of()));
 
         mockMvc.perform(
-                        get("/repositories?username=testUser")
+                        get("/users/testUser/repositories")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
@@ -111,7 +111,7 @@ public class RepositoryControllerIntegrationTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
         ).thenThrow(new HttpClientErrorException(HttpStatus.valueOf(403), "Limit exceeded"));
         mockMvc.perform(
-                        get("/repositories?username=testUser")
+                        get("/users/testUser/repositories")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().is(403))
@@ -122,20 +122,11 @@ public class RepositoryControllerIntegrationTest {
     @Test
     void shouldReturnErrorMessageInCaseOfIncorrectAcceptHeaderValue() throws Exception {
         mockMvc.perform(
-                        get("/repositories?username=testUser")
+                        get("/users/testUser/repositories")
                                 .accept(MediaType.APPLICATION_XML_VALUE))
                 .andExpect(status().is(HttpStatus.NOT_ACCEPTABLE.value()))
                 .andExpect(jsonPath("$.status", equalTo(HttpStatus.NOT_ACCEPTABLE.value())))
                 .andExpect(jsonPath("$.Message", equalTo("Could not find acceptable representation")));
-    }
-
-    @Test
-    void shouldReturnBadRequestIfUsernameIsMissing() throws Exception {
-        mockMvc.perform(
-                        get("/repositories")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -147,7 +138,7 @@ public class RepositoryControllerIntegrationTest {
                 ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
         ).thenThrow(new HttpClientErrorException(HttpStatus.valueOf(404), "User doesn't exist"));
         mockMvc.perform(
-                        get("/repositories?username=not_existing_user")
+                        get("/users/testUser/repositories")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isNotFound())

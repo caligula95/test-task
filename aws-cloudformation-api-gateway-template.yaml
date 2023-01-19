@@ -41,6 +41,6 @@ Resources:
         ConnectionType: INTERNET
         IntegrationHttpMethod: GET
         Type: HTTP_PROXY
-        Uri: "http://fargatealb-234174894.eu-central-1.elb.amazonaws.com"
+        Uri: "http://fargatealb-1957197942.eu-central-1.elb.amazonaws.com"
       ResourceId: !Ref Resource
       RestApiId: !Ref RestApi

@@ -55,7 +55,7 @@ public class RepositoryServiceIntegrationTest {
                 .thenReturn(ResponseEntity.ok(githubRepositoriesResponse))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
-        List<Repository> repositories = repositoryService.getRepositoriesByUsername("username");
+        List<Repository> repositories = repositoryService.getNonForkRepositoriesByUsername("username");
         assertThat(repositories).isNotNull();
         assertThat(repositories.get(0).getName()).isEqualTo("repoNamefalse");
     }
@@ -73,7 +73,7 @@ public class RepositoryServiceIntegrationTest {
                 .thenReturn(ResponseEntity.ok(githubRepositoriesResponse))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
-        List<Repository> repositories = repositoryService.getRepositoriesByUsername("username");
+        List<Repository> repositories = repositoryService.getNonForkRepositoriesByUsername("username");
         assertThat(repositories).isNotNull();
         assertThat(repositories.size()).isZero();
     }
