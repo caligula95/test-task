@@ -1,11 +1,10 @@
 package com.tui.service;
 
 import com.tui.client.GithubClient;
-import com.tui.component.GithubConverter;
+import com.tui.converter.GithubConverter;
 import com.tui.model.Repository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 
 import java.util.List;
 
@@ -21,19 +20,19 @@ class GithubRepositoryServiceTest {
     @BeforeEach
     void setUp() {
         githubClient = mock(GithubClient.class);
-        GithubConverter githubConverter = new GithubConverter(new ModelMapper());
+        GithubConverter githubConverter = new GithubConverter();
         repositoryService = new GithubRepositoryService(githubClient, githubConverter);
     }
 
     @Test
     void getRepositoriesByUsername() {
-        when(githubClient.getBranchesByRepositoryAndUserName(any(), any()))
+        when(githubClient.getAllBranchesByRepositoryAndUserName(any(), any()))
                 .thenReturn(List.of(aGithubBranch()));
-        when(githubClient.getRepositoriesByUsername(any()))
+        when(githubClient.getAllRepositoriesByUsername(any()))
                 .thenReturn(List.of(aGithubRepository(true),
                         aGithubRepository(false)));
 
-        List<Repository> repositories = repositoryService.getNonForkRepositoriesByUsername("username");
+        List<Repository> repositories = repositoryService.getRepositoriesByUsernameAndForkParam("username", false);
         assertThat(repositories).isNotNull();
         assertThat(repositories.size()).isOne();
         assertThat(repositories.get(0).getName()).isEqualTo("repoNamefalse");
@@ -42,26 +41,26 @@ class GithubRepositoryServiceTest {
 
     @Test
     void getRepositoriesByUsernameIsemptyIfAllFork() {
-        when(githubClient.getBranchesByRepositoryAndUserName(any(), any()))
+        when(githubClient.getAllBranchesByRepositoryAndUserName(any(), any()))
                 .thenReturn(List.of(aGithubBranch()));
-        when(githubClient.getRepositoriesByUsername(any()))
+        when(githubClient.getAllRepositoriesByUsername(any()))
                 .thenReturn(List.of(aGithubRepository(true),
                         aGithubRepository(true)));
 
-        List<Repository> repositories = repositoryService.getNonForkRepositoriesByUsername("username");
+        List<Repository> repositories = repositoryService.getRepositoriesByUsernameAndForkParam("username", false);
         assertThat(repositories).isNotNull();
         assertThat(repositories.size()).isZero();
     }
 
     @Test
     void getRepositoriesByUsernameBranchesAreEmptyIfNotPresentInResponse() {
-        when(githubClient.getBranchesByRepositoryAndUserName(any(), any()))
+        when(githubClient.getAllBranchesByRepositoryAndUserName(any(), any()))
                 .thenReturn(List.of());
-        when(githubClient.getRepositoriesByUsername(any()))
+        when(githubClient.getAllRepositoriesByUsername(any()))
                 .thenReturn(List.of(aGithubRepository(false),
                         aGithubRepository(false)));
 
-        List<Repository> repositories = repositoryService.getNonForkRepositoriesByUsername("username");
+        List<Repository> repositories = repositoryService.getRepositoriesByUsernameAndForkParam("username", false);
         assertThat(repositories.get(0).getBranches().size()).isZero();
     }
 }

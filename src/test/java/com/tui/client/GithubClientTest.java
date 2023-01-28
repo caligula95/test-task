@@ -35,18 +35,18 @@ class GithubClientTest {
 
     @Test
     void getAllRepositoriesByUsername() {
-        List<GithubBranch> githubBranches = List.of(aGithubBranch(),
-                aGithubBranch());
+        List<GithubRepository> githubRepositories = List.of(aGithubRepository(false),
+                aGithubRepository(false));
         when(restTemplate.exchange(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<GithubBranch>>>any())
-        ).thenReturn(ResponseEntity.ok(githubBranches))
-                .thenReturn(ResponseEntity.ok(List.of(aGithubBranch())))
+                ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
+        ).thenReturn(ResponseEntity.ok(githubRepositories))
+                .thenReturn(ResponseEntity.ok(List.of(aGithubRepository(false))))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
-        List<GithubRepository> githubResponse = githubClient.getRepositoriesByUsername("username");
+        List<GithubRepository> githubResponse = githubClient.getAllRepositoriesByUsername("username");
         assertThat(githubResponse).isNotNull();
         assertThat(githubResponse.size()).isEqualTo(3);
     }
@@ -57,10 +57,10 @@ class GithubClientTest {
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<GithubBranch>>>any())
+                ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
         ).thenReturn(ResponseEntity.ok(List.of()));
 
-        List<GithubRepository> githubResponse = githubClient.getRepositoriesByUsername("username");
+        List<GithubRepository> githubResponse = githubClient.getAllRepositoriesByUsername("username");
         assertThat(githubResponse).isNotNull();
         assertThat(githubResponse.size()).isZero();
     }
@@ -71,30 +71,29 @@ class GithubClientTest {
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<GithubBranch>>>any())
+                ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
         ).thenReturn(ResponseEntity.badRequest().build());
 
         assertThrows(ClientException.class,
-                () -> githubClient.getRepositoriesByUsername("username"));
+                () -> githubClient.getAllRepositoriesByUsername("username"));
     }
 
     @Test
     void getAllBranchesByRepositoryAndUserName() {
-        List<GithubRepository> githubRepositoriesResponse = List.of(aGithubRepository(true),
-                aGithubRepository(true));
+        List<GithubBranch> githubBranches = List.of(aGithubBranch(), aGithubBranch());
         when(restTemplate.exchange(
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
-        ).thenReturn(ResponseEntity.ok(githubRepositoriesResponse))
-                .thenReturn(ResponseEntity.ok(githubRepositoriesResponse))
+                ArgumentMatchers.<ParameterizedTypeReference<List<GithubBranch>>>any())
+        ).thenReturn(ResponseEntity.ok(githubBranches))
+                .thenReturn(ResponseEntity.ok(List.of(aGithubBranch())))
                 .thenReturn(ResponseEntity.ok(List.of()));
 
         List<GithubBranch> githubResponse = githubClient
-                .getBranchesByRepositoryAndUserName("repositoryName", "username");
+                .getAllBranchesByRepositoryAndUserName("repositoryName", "username");
         assertThat(githubResponse).isNotNull();
-        assertThat(githubResponse.size()).isEqualTo(4);
+        assertThat(githubResponse.size()).isEqualTo(3);
     }
 
     @Test
@@ -103,11 +102,11 @@ class GithubClientTest {
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
+                ArgumentMatchers.<ParameterizedTypeReference<List<GithubBranch>>>any())
         ).thenReturn(ResponseEntity.badRequest().build());
 
         assertThrows(ClientException.class,
-                () -> githubClient.getBranchesByRepositoryAndUserName("repositoryName", "username"));
+                () -> githubClient.getAllBranchesByRepositoryAndUserName("repositoryName", "username"));
     }
 
     @Test
@@ -116,11 +115,11 @@ class GithubClientTest {
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(HttpMethod.class),
                 ArgumentMatchers.any(),
-                ArgumentMatchers.<ParameterizedTypeReference<List<GithubRepository>>>any())
+                ArgumentMatchers.<ParameterizedTypeReference<List<GithubBranch>>>any())
         ).thenReturn(ResponseEntity.ok(List.of()));
 
         List<GithubBranch> githubResponse = githubClient
-                .getBranchesByRepositoryAndUserName("repositoryName", "username");
+                .getAllBranchesByRepositoryAndUserName("repositoryName", "username");
         assertThat(githubResponse).isNotNull();
         assertThat(githubResponse.size()).isZero();
     }

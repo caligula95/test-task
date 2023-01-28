@@ -34,7 +34,7 @@ public class GithubClient {
      * @param username username in github
      * @return list of {@link GithubRepository}
      */
-    public List<GithubRepository> getRepositoriesByUsername(String username) {
+    public List<GithubRepository> getAllRepositoriesByUsername(String username) {
         return getAllUserRepositories(username, new ArrayList<>());
     }
 
@@ -45,7 +45,7 @@ public class GithubClient {
      * @param username       username in github
      * @return list of {@link GithubBranch}
      */
-    public List<GithubBranch> getBranchesByRepositoryAndUserName(String repositoryName, String username) {
+    public List<GithubBranch> getAllBranchesByRepositoryAndUserName(String repositoryName, String username) {
         return getAllRepoBranches(repositoryName, username, new ArrayList<>());
     }
 

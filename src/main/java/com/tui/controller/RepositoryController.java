@@ -29,6 +29,6 @@ public class RepositoryController {
     @GetMapping(value = "/users/{username}/repositories", headers = ACCEPT + "=" + APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Repository>> getRepositories(@PathVariable String username) {
         log.info("Handling get user repositories request with username: {}", username);
-        return ResponseEntity.ok(repositoryService.getNonForkRepositoriesByUsername(username));
+        return ResponseEntity.ok(repositoryService.getRepositoriesByUsernameAndForkParam(username, false));
     }
 }

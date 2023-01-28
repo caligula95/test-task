@@ -2,6 +2,8 @@ Parameters:
   Prefix:
     Type: String
     Default: testapp
+  Url:
+    Type: String
 Resources:
   RestApi:
     Type: AWS::ApiGateway::RestApi
@@ -41,6 +43,6 @@ Resources:
         ConnectionType: INTERNET
         IntegrationHttpMethod: GET
         Type: HTTP_PROXY
-        Uri: "http://fargatealb-1957197942.eu-central-1.elb.amazonaws.com"
+        Uri: !Ref Url
       ResourceId: !Ref Resource
       RestApiId: !Ref RestApi

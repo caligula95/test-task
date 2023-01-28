@@ -2,7 +2,7 @@ package com.tui.service;
 
 import com.tui.client.GithubClient;
 import com.tui.client.response.GithubRepository;
-import com.tui.component.GithubConverter;
+import com.tui.converter.GithubConverter;
 import com.tui.model.Repository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,10 +18,10 @@ public class GithubRepositoryService implements RepositoryService {
     private final GithubConverter githubConverter;
 
     @Override
-    public List<Repository> getNonForkRepositoriesByUsername(String username) {
+    public List<Repository> getRepositoriesByUsernameAndForkParam(String username, boolean isFork) {
 
-        return githubClient.getRepositoriesByUsername(username).stream()
-                .filter(repo -> !repo.getFork())
+        return githubClient.getAllRepositoriesByUsername(username).stream()
+                .filter(repo -> repo.getFork().equals(isFork))
                 .parallel()
                 .map(repository -> getRepositoryWithBranches(username, repository))
                 .collect(Collectors.toList());
@@ -29,7 +29,7 @@ public class GithubRepositoryService implements RepositoryService {
 
     private Repository getRepositoryWithBranches(String username, GithubRepository githubRepository) {
         Repository repository = githubConverter.convert(githubRepository);
-        repository.setBranches(githubClient.getBranchesByRepositoryAndUserName(githubRepository.getName(), username).stream()
+        repository.setBranches(githubClient.getAllBranchesByRepositoryAndUserName(githubRepository.getName(), username).stream()
                 .map(githubConverter::convert)
                 .collect(Collectors.toList()));
         return repository;

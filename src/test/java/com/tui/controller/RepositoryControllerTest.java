@@ -32,18 +32,18 @@ class RepositoryControllerTest {
     @Test
     void getRepositories() throws Exception {
         List<Repository> repositories = List.of(aRepository(), aRepository());
-        when(repositoryService.getNonForkRepositoriesByUsername(any())).thenReturn(repositories);
+        when(repositoryService.getRepositoriesByUsernameAndForkParam(anyString(), anyBoolean())).thenReturn(repositories);
         mockMvc.perform(get("/users/testUser/repositories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(repositories)))
                 .andExpect(status().isOk());
-        verify(repositoryService).getNonForkRepositoriesByUsername("testUser");
+        verify(repositoryService).getRepositoriesByUsernameAndForkParam("testUser", false);
     }
 
     @Test
     void getRepositoriesReturnsEmptyListIfNoResponse() throws Exception {
         List<Repository> repositories = List.of();
-        when(repositoryService.getNonForkRepositoriesByUsername(any())).thenReturn(repositories);
+        when(repositoryService.getRepositoriesByUsernameAndForkParam(anyString(), anyBoolean())).thenReturn(repositories);
         mockMvc.perform(get("/users/testUser/repositories")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(objectMapper.writeValueAsString(repositories)))
