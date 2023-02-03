@@ -46,7 +46,7 @@ public class RepositoryServiceIntegrationTest {
     }
 
     @Test
-    void getRepositoriesByUsername() throws Exception{
+    void getRepositoriesByUsername() throws Exception {
         List<GithubRepository> githubRepositoriesResponse = List.of(aGithubRepository(false),
                 aGithubRepository(true));
         List<GithubBranch> githubBranches = List.of(aGithubBranch(),
@@ -63,7 +63,7 @@ public class RepositoryServiceIntegrationTest {
     }
 
     @Test
-    void getRepositoriesReturnUserRepositoriesEmptyIfAllFork() throws Exception{
+    void getRepositoriesReturnUserRepositoriesEmptyIfAllFork() throws Exception {
         List<GithubRepository> githubRepositoriesResponse = List.of(aGithubRepository(true),
                 aGithubRepository(true));
 

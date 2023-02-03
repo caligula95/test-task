@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -23,7 +22,10 @@ import java.util.List;
 @Slf4j
 public class GithubClient {
 
-    public static final int FIRST_PAGE = 1;
+    public static final String PAGE = "page";
+    public static final String PER_PAGE = "per_page";
+    public static final String TYPE = "type";
+    public static final String SOURCE = "source";
 
     private final RestTemplate restTemplate;
     private final GithubProperties githubProperties;
@@ -34,8 +36,18 @@ public class GithubClient {
      * @param username username in github
      * @return list of {@link GithubRepository}
      */
-    public List<GithubRepository> getAllRepositoriesByUsername(String username) {
-        return getAllUserRepositories(username, new ArrayList<>());
+    public List<GithubRepository> getRepositoriesByUsername(String username, int page, int pageSize) {
+        HttpHeaders headers = new HttpHeaders();
+        ResponseEntity<List<GithubRepository>> response = restTemplate.exchange(prepareGetRepositoriesRequest(page, pageSize, username),
+                HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
+                });
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.error("Failed to get repositories: {}, {}", response.getStatusCode(), response.getBody());
+            throw new ClientException("Github get repositories request failed: " + response.getStatusCode());
+        }
+
+        return response.getBody();
     }
 
     /**
@@ -45,38 +57,9 @@ public class GithubClient {
      * @param username       username in github
      * @return list of {@link GithubBranch}
      */
-    public List<GithubBranch> getAllBranchesByRepositoryAndUserName(String repositoryName, String username) {
-        return getAllRepoBranches(repositoryName, username, new ArrayList<>());
-    }
-
-    private List<GithubBranch> getAllRepoBranches(String repositoryName,
-                                                  String username, List<GithubBranch> allBranches) {
-        int pageCount = FIRST_PAGE;
+    public List<GithubBranch> getBranchesByRepositoryAndUserName(String repositoryName, String username, int page, int pageSize) {
         HttpHeaders headers = new HttpHeaders();
-        ResponseEntity<List<GithubBranch>> response = restTemplate.exchange(prepareGetBranchesRequest(pageCount, repositoryName, username),
-                HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
-                });
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            log.error("Failed to get branches: {}, {}", response.getStatusCode(), response.getBody());
-            throw new ClientException("Github get branches request failed: " + response.getStatusCode());
-        }
-        List<GithubBranch> responseBody = response.getBody();
-        while (responseBody != null && !responseBody.isEmpty()) {
-            allBranches.addAll(responseBody);
-            response = restTemplate.exchange(prepareGetBranchesRequest(++pageCount, repositoryName, username),
-                    HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
-                    });
-            responseBody = response.getBody();
-        }
-        return allBranches;
-    }
-
-    private List<GithubRepository> getAllUserRepositories(String username,
-                                                          List<GithubRepository> allRepos) {
-        int pageCount = FIRST_PAGE;
-        HttpHeaders headers = new HttpHeaders();
-        ResponseEntity<List<GithubRepository>> response = restTemplate.exchange(prepareGetRepositoriesRequest(pageCount, username),
+        ResponseEntity<List<GithubBranch>> response = restTemplate.exchange(prepareGetBranchesRequest(page, pageSize, repositoryName, username),
                 HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
                 });
 
@@ -85,28 +68,22 @@ public class GithubClient {
             throw new ClientException("Github get repositories request failed: " + response.getStatusCode());
         }
 
-        List<GithubRepository> responseBody = response.getBody();
-        while (responseBody != null && !responseBody.isEmpty()) {
-            allRepos.addAll(responseBody);
-            response = restTemplate.exchange(prepareGetRepositoriesRequest(++pageCount, username),
-                    HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
-                    });
-            responseBody = response.getBody();
-        }
-        return allRepos;
+        return response.getBody();
     }
 
-    private String prepareGetRepositoriesRequest(int pageCount, String username) {
+    private String prepareGetRepositoriesRequest(int page, int perPage, String username) {
         return UriComponentsBuilder.fromHttpUrl(githubProperties.getUrl() + "/users/" + username + "/repos")
-                .queryParam("type", "source")
-                .queryParam("page", pageCount)
+                .queryParam(TYPE, SOURCE)
+                .queryParam(PAGE, page)
+                .queryParam(PER_PAGE, perPage)
                 .toUriString();
     }
 
-    private String prepareGetBranchesRequest(int pageCount, String repositoryName, String username) {
+    private String prepareGetBranchesRequest(int page, int perPage, String repositoryName, String username) {
         return UriComponentsBuilder.fromHttpUrl(githubProperties.getUrl()
                         + "/repos/" + username + "/" + repositoryName + "/branches")
-                .queryParam("page", pageCount)
+                .queryParam(PAGE, page)
+                .queryParam(PER_PAGE, perPage)
                 .toUriString();
     }
 }

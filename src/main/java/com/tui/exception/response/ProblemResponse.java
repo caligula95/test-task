@@ -1,4 +1,4 @@
-package com.tui.exception;
+package com.tui.exception.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

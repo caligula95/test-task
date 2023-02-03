@@ -1,7 +1,7 @@
 package com.tui.controller;
 
 import com.tui.exception.ClientException;
-import com.tui.exception.ProblemResponse;
+import com.tui.exception.response.ProblemResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
