@@ -4,7 +4,6 @@ import com.tui.model.Repository;
 import com.tui.service.RepositoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,9 +27,9 @@ public class RepositoryController {
     private final RepositoryService repositoryService;
 
     @GetMapping(value = "/users/{username}/repositories", headers = ACCEPT + "=" + APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Repository>> getRepositories(@PathVariable String username,
+    public List<Repository> getRepositories(@PathVariable String username,
                                                             @RequestParam(value = "fork", required = false) boolean isFork) {
         log.info("Handling get user repositories request with username: {}", username);
-        return ResponseEntity.ok(repositoryService.getRepositoriesByUsernameAndForkParam(username, isFork));
+        return repositoryService.getRepositoriesByUsernameAndForkParam(username, isFork);
     }
 }

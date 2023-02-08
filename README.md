@@ -4,11 +4,12 @@ This project exposes REST API which can return results from Github API user repo
 
 # How to build and run
 
-Project can be compiled with JDK 11 and above `javac`.
+Project can be compiled with JDK 19 and above `javac`.
 
 To compile just do `mvn clean package`.
 
-Spring Boot Version : 2.7.7 Java Version : 11
+Spring Boot Version : 3.0.2 Java Version : 19 
+Maven Version : 3.8.6
 
 ## Prerequisites
 

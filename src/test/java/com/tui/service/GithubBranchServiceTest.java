@@ -9,9 +9,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static com.tui.prototype.GithubResponsePrototype.aGithubBranch;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+
 
 class GithubBranchServiceTest {
 
@@ -40,7 +41,10 @@ class GithubBranchServiceTest {
                 "username");
         assertThat(branches).isNotNull();
         assertThat(branches.size()).isEqualTo(6);
-        assertThat(branches.get(0).getName()).isEqualTo("name");
+
+        assertThat(branches).extracting("name").contains("name");
+        assertThat(branches).extracting("lastCommitSha").contains("testSha");
+
 
         verify(githubClient, times(4))
                 .getBranchesByRepositoryAndUserName(eq("repositoryname"), eq("username"),

@@ -4,6 +4,7 @@ import com.tui.client.GithubClient;
 import com.tui.mapper.GithubRepositoryMapper;
 import com.tui.model.Branch;
 import com.tui.model.Repository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,8 +47,10 @@ class GithubRepositoryServiceTest {
         List<Repository> repositories = repositoryService.getRepositoriesByUsernameAndForkParam("username", false);
         assertThat(repositories).isNotNull();
         assertThat(repositories.size()).isEqualTo(3);
-        assertThat(repositories.get(0).getName()).isEqualTo("repoNamefalse");
         assertThat(repositories.get(0).getBranches().size()).isEqualTo(2);
+
+        Assertions.assertThat(repositories).extracting("name").contains("repoNamefalse");
+        Assertions.assertThat(repositories).extracting("ownerLogin").contains("ownerLogin");
 
         verify(githubClient, times(4)).getRepositoriesByUsername(eq("username"), anyInt(), eq(100));
     }
@@ -74,7 +77,9 @@ class GithubRepositoryServiceTest {
                 .thenReturn(List.of());
 
         List<Repository> repositories = repositoryService.getRepositoriesByUsernameAndForkParam("username", false);
-        assertThat(repositories.get(0).getBranches().size()).isZero();
+
+        Assertions.assertThat(repositories)
+                .flatExtracting("branches").isEmpty();
 
         verify(githubClient).getRepositoriesByUsername(eq("username"), eq(1), eq(100));
         verify(branchService, times(2)).getBranchesByRepositoryAndUsername(anyString(), eq("username"));
